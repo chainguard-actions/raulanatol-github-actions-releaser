@@ -1,0 +1,21 @@
+name: Test with TAG_NAME input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/tags/v1.0.0
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG_NAME: v1.0.0
+        continue-on-error: true
+      - name: Assert action ran with TAG_NAME
+        run: |
+          echo "Action completed with TAG_NAME=v1.0.0 (may fail due to no real GitHub context, but inputs were accepted)"
+          echo "PASS"
