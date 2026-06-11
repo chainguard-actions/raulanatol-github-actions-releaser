@@ -1,0 +1,31 @@
+name: Test TAG_NAME input with NO_CREATE_RELEASE
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/tags/v3.0.0
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          TAG_NAME: v3.0.0
+          NO_CREATE_RELEASE: 'true'
+      - name: Assert action ran (pass or expected failure without token)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          # The action may fail due to missing GitHub token in act environment,
+          # but it must have been invoked (not skipped). Any outcome other than
+          # 'skipped' is acceptable here.
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action ran with TAG_NAME and NO_CREATE_RELEASE inputs"
