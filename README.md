@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | v2.1.0 | [`v2.1.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.1.0) | [`e081e95`](https://github.com/raulanatol/github-actions-releaser/commit/e081e957d8870388da69230b325733a098f88f8f) |
+| v2.3.0 | [`v2.3.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.3.0) | [`d965aeb`](https://github.com/raulanatol/github-actions-releaser/commit/d965aeb6cbcafa11eb46ba8b63a0e8dcd819fa9f) |
 
 ## Privacy
 
