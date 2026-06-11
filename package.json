@@ -1,0 +1,64 @@
+{
+  "name": "github-actions-releaser",
+  "version": "2.4.1",
+  "description": "This action generate a release notes from closed issues",
+  "keywords": [
+    "actions",
+    "node",
+    "publish",
+    "release"
+  ],
+  "homepage": "https://github.com/raulanatol/github-actions-releaser#readme",
+  "bugs": {
+    "url": "https://github.com/raulanatol/github-actions-releaser/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raulanatol/github-actions-releaser.git"
+  },
+  "license": "MIT",
+  "author": "raulanatol",
+  "type": "module",
+  "contributors": [
+    "tmolitor-stud-tu"
+  ],
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsup src/main.ts --format esm --target=node20 --platform=node --clean --sourcemap --out-dir dist",
+    "clean": "shx rm -rf dist",
+    "lint": "eslint . --ext .ts",
+    "pack": "ncc build",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "vitest run",
+    "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write .",
+    "prepare": "npm run build",
+    "check": "npm run lint && npm run test"
+  },
+  "dependencies": {
+    "@actions/core": "1.11.1",
+    "@actions/github": "6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@typescript-eslint/eslint-plugin": "8.47.0",
+    "@typescript-eslint/parser": "8.47.0",
+    "@vercel/ncc": "0.38.4",
+    "eslint": "9.39.1",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.6.2",
+    "shx": "^0.4.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.47.0",
+    "vitest": "4.0.11"
+  },
+  "engines": {
+    "node": "=20.18.0",
+    "npm": "=10.8.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "engineStrict": true
+}

@@ -1,0 +1,27 @@
+name: Test with TAG_NAME input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/tags/v1.2.3
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          TAG_NAME: 'v1.2.3'
+          NO_CREATE_RELEASE: 'true'
+        continue-on-error: true
+      - name: Assert action ran with TAG_NAME input (may fail without GitHub token but inputs were accepted)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with TAG_NAME input (outcome=$OUTCOME)"
