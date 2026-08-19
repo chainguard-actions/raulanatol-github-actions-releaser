@@ -1,27 +1,29 @@
-name: Test basic usage with TAG_NAME
+name: Test auto-tagging (no TAG_NAME)
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REF: refs/tags/v1.0.0
-      GITHUB_EVENT_NAME: push
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
       - id: action
         uses: .
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: v1.0.0
         continue-on-error: true
-      - name: Assert action ran (outcome is success or failure, not skipped)
+      - name: Assert action ran without crashing
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "action outcome: $OUTCOME"
+          # Without TAG_NAME the action auto-detects the tag from context.ref.
+          # It may legitimately fail if there are no qualifying issues or if the
+          # release already exists, but it must not be skipped (which would
+          # indicate a configuration/setup problem).
           if [ "$OUTCOME" = "skipped" ]; then
-            echo "FAIL: action was skipped, expected it to run"
+            echo "FAIL: action step was skipped unexpectedly"
             exit 1
           fi
           echo "PASS: action ran with outcome=$OUTCOME"

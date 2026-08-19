@@ -1,0 +1,15 @@
+name: "build-test"
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+permissions: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+      - run: |
+          npm install
+          make

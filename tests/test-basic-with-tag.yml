@@ -4,24 +4,26 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REF: refs/tags/v1.0.0
-      GITHUB_EVENT_NAME: push
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
       - id: action
         uses: .
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: v1.0.0
+          TAG_NAME: v99.0.0-test
         continue-on-error: true
-      - name: Assert action ran (outcome is success or failure, not skipped)
+      - name: Assert action ran (completed or failed gracefully)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "action outcome: $OUTCOME"
+          # The action may fail if there are no closed issues or if the tag already
+          # exists, but it should not be skipped (which would indicate a setup problem).
+          # We accept both success and failure as valid outcomes.
           if [ "$OUTCOME" = "skipped" ]; then
-            echo "FAIL: action was skipped, expected it to run"
+            echo "FAIL: action step was skipped unexpectedly"
             exit 1
           fi
           echo "PASS: action ran with outcome=$OUTCOME"
