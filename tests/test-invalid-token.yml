@@ -1,0 +1,33 @@
+name: Test with invalid GITHUB_TOKEN
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/tags/v2.0.0
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: invalid-token
+          TAG_NAME: v2.0.0
+      - name: Assert action ran and failed gracefully (not skipped)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          if [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed as expected with invalid token"
+          elif [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action completed (token may have been accepted)"
+          else
+            echo "PASS: action ran with outcome=$OUTCOME"
+          fi

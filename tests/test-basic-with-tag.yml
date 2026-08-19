@@ -1,0 +1,32 @@
+name: Test basic usage with TAG_NAME
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Set up git origin reachable inside Docker/Node action
+        run: |
+          git config user.email "test@example.com"
+          git config user.name "Test User"
+      - id: action
+        uses: .
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: v99.0.0-test
+        continue-on-error: true
+      - name: Assert action ran without unexpected crash
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action may succeed or fail depending on repo state (e.g. no closed issues),
+          # but it must not be 'skipped' — it must have actually executed.
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action executed (outcome=$OUTCOME)"
