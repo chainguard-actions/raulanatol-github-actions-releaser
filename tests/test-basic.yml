@@ -1,4 +1,4 @@
-name: Test basic usage with GITHUB_TOKEN
+name: Test basic usage with TAG_NAME
 on:
   workflow_dispatch:
 jobs:
@@ -6,15 +6,23 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_EVENT_NAME: push
-      GITHUB_REF: refs/heads/main
+      GITHUB_REF: refs/tags/v1.0.0
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+      - name: Run action with TAG_NAME
+        id: action
+        continue-on-error: true
         uses: .
         with:
           GITHUB_TOKEN: ${{ github.token }}
-        continue-on-error: true
-      - name: Assert action ran
+          TAG_NAME: v1.0.0
+      - name: Assert action ran (outcome is success or failure, not skipped)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
         run: |
-          echo "Action completed (may fail due to no real GitHub context, but input was accepted)"
-          echo "PASS"
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with outcome=$OUTCOME"
