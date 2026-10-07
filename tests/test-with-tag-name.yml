@@ -1,4 +1,4 @@
-name: Test basic usage - generate release notes only
+name: Test with explicit TAG_NAME input
 on:
   workflow_dispatch:
 jobs:
@@ -10,6 +10,7 @@ jobs:
         uses: .
         continue-on-error: true
         with:
+          TAG_NAME: 'v1.0.0'
           NO_CREATE_RELEASE: 'true'
       - name: Assert action ran (succeeded or failed gracefully on sentinel repo)
         env:
@@ -17,7 +18,7 @@ jobs:
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" = "success" ]; then
-            echo "PASS: action succeeded"
+            echo "PASS: action succeeded with TAG_NAME=v1.0.0"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
           else
