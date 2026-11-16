@@ -1,18 +1,118 @@
-# raulanatol/github-actions-releaser
+<div align="center">
+    <h1>Github Actions Releaser</h1>
+</div>
 
-Create a release notes based on last closed issues
+<p>This action generates release notes from the issues and pull requests closed since the previous release, and (optionally) publishes them as a GitHub release.</p>
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/raulanatol/github-actions-releaser](https://github.com/raulanatol/github-actions-releaser).
+# How it works
 
-## Versions
+1. Reads the publication date of the latest release. If there is none, the whole history is used.
+2. Collects the issues closed and the pull requests merged since that date.
+3. Groups them into `🐛 Bug Fixes`, `🚀 Features`, `💄 Enhancements` and `🛠 Others`. The group is
+   taken from the `bug` / `type: bug` / `enhancement` / `type: enhancement` / `feature` / `type: feature`
+   labels, and falls back to the conventional-commit prefix of the title (`fix:`, `feat:`, `test:`,
+   `chore:`, `docs:`).
+4. Creates the release for the pushed tag, unless `NO_CREATE_RELEASE` is set to `true`.
 
-| Version | Tag | Upstream commit | Hardening report |
-|---------|-----|-----------------|------------------|
-| v2.1.0 | [`v2.1.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.1.0) | [`e081e95`](https://github.com/raulanatol/github-actions-releaser/commit/e081e957d8870388da69230b325733a098f88f8f) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v2.1.0/HARDENING.md) |
-| v2.2.0 | [`v2.2.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.2.0) | [`a5d1fcb`](https://github.com/raulanatol/github-actions-releaser/commit/a5d1fcbee4c7ed219660cf32f12b29793e9236c2) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v2.2.0/HARDENING.md) |
-| v2.3.0 | [`v2.3.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.3.0) | [`d965aeb`](https://github.com/raulanatol/github-actions-releaser/commit/d965aeb6cbcafa11eb46ba8b63a0e8dcd819fa9f) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v2.3.0/HARDENING.md) |
-| v2.4.1 | [`v2.4.1`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.4.1) | [`0561367`](https://github.com/raulanatol/github-actions-releaser/commit/0561367453f1cdbac0e5b71728276a4eb594e91a) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v2.4.1/HARDENING.md) |
-| v3.0.0 | [`v3.0.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v3.0.0) | [`a10fee2`](https://github.com/raulanatol/github-actions-releaser/commit/a10fee22a340ba799bedd927466c37f09b8d71ce) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v3.0.0/HARDENING.md) |
+# Inputs
+
+| Key                 | Description                                                       | Required  | Default |
+| ------------------- | ----------------------------------------------------------------- | --------- | ------- |
+| `TAG_NAME`          | The new tag name. Omit it to use the tag that triggered the run   | **FALSE** | —       |
+| `NO_CREATE_RELEASE` | If `true`, only generates the notes and does not create a release | **FALSE** | `false` |
+
+`GITHUB_TOKEN` is not an input: it is read from the environment and must be provided via `env`
+(see the examples below).
+
+# Outputs
+
+| Key          | Description                                                          |
+| ------------ | -------------------------------------------------------------------- |
+| `notes`      | The generated release notes                                          |
+| `id`         | Id of the created release. Empty when `NO_CREATE_RELEASE` is `true`  |
+| `html_url`   | URL of the created release. Empty when `NO_CREATE_RELEASE` is `true` |
+| `upload_url` | Asset upload URL. Empty when `NO_CREATE_RELEASE` is `true`           |
+
+# Example usage
+
+Create the file `workflow.yml` in the `.github/workflows` folder.
+
+```yaml
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: write
+  pull-requests: read
+  issues: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Generate release notes
+        uses: raulanatol/github-actions-releaser@v4.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## With custom tag name
+
+Replace the `Generate release notes` step of the previous example with:
+
+```yaml
+- name: Generate release notes
+  uses: raulanatol/github-actions-releaser@v4.0.0
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    TAG_NAME: vTestName
+```
+
+## Using the notes without creating a release
+
+```yaml
+- name: Generate release notes
+  id: notes
+  uses: raulanatol/github-actions-releaser@v4.0.0
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    NO_CREATE_RELEASE: 'true'
+- run: echo "${{ steps.notes.outputs.notes }}"
+```
+
+# Requirements
+
+- The action runs on the `node24` runner, available on GitHub-hosted runners and on
+  self-hosted runners with runner version `2.327.0` or newer.
+- `contents: write` permission is required to create the release. It can be lowered to
+  `contents: read` when `NO_CREATE_RELEASE` is `true`.
+
+# Example projects
+
+- [Javascript] https://github.com/raulanatol/javascript-example-gar
+
+# Development
+
+Node version is pinned in `.nvmrc`.
+
+```bash
+make init    # install dependencies
+make test    # run the test suite
+make build   # bundle the action into dist/
+make         # lint + type-check + test + build
+```
+
+The bundle in `dist/index.js` is what the runner executes, so it is committed to the
+repository. Any change to `src/` must be built and committed together with the source;
+CI fails if `dist/` is out of date.
+
+# License
+
+[MIT](LICENSE)
 
 ## Privacy
 

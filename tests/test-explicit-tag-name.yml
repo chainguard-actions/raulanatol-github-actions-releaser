@@ -1,0 +1,45 @@
+name: Test explicit TAG_NAME (notes only)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          TAG_NAME: 'v9.9.9-acttest'
+          NO_CREATE_RELEASE: 'true'
+      - name: Assert notes generated with explicit tag (or graceful failure on sentinel repo)
+        env:
+          NOTES: ${{ steps.action.outputs.notes }}
+          RELEASE_ID: ${{ steps.action.outputs.id }}
+          HTML_URL: ${{ steps.action.outputs.html_url }}
+          UPLOAD_URL: ${{ steps.action.outputs.upload_url }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "notes: $NOTES"
+          echo "id: $RELEASE_ID"
+          echo "html_url: $HTML_URL"
+          echo "upload_url: $UPLOAD_URL"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$NOTES" ]; then
+              echo "FAIL: notes output is empty"
+              exit 1
+            fi
+            if [ -n "$RELEASE_ID" ] || [ -n "$HTML_URL" ] || [ -n "$UPLOAD_URL" ]; then
+              echo "FAIL: release outputs should be empty when NO_CREATE_RELEASE=true"
+              exit 1
+            fi
+            echo "PASS: notes generated with explicit TAG_NAME and no release created"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

@@ -1,0 +1,62 @@
+{
+  "name": "github-actions-releaser",
+  "version": "4.0.1",
+  "description": "This action generate a release notes from closed issues",
+  "keywords": [
+    "actions",
+    "node",
+    "publish",
+    "release"
+  ],
+  "homepage": "https://github.com/raulanatol/github-actions-releaser#readme",
+  "bugs": {
+    "url": "https://github.com/raulanatol/github-actions-releaser/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raulanatol/github-actions-releaser.git"
+  },
+  "license": "MIT",
+  "author": "raulanatol",
+  "type": "module",
+  "contributors": [
+    "tmolitor-stud-tu"
+  ],
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsup",
+    "clean": "shx rm -rf dist",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write .",
+    "prepare": "npm run build",
+    "check": "npm run lint && npm run test"
+  },
+  "dependencies": {
+    "@actions/core": "3.0.1",
+    "@actions/github": "9.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.2.0",
+    "eslint": "10.8.1",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.9.6",
+    "shx": "0.4.0",
+    "tsup": "8.5.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.67.0",
+    "vitest": "4.1.12"
+  },
+  "overrides": {
+    "rollup": "4.62.4"
+  },
+  "engines": {
+    "node": ">=24",
+    "npm": ">=10"
+  },
+  "files": [
+    "dist"
+  ],
+  "engineStrict": true
+}

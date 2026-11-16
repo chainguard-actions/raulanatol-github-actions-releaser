@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -eu
+
+function error() {
+  echo "🚨 Error: $1"
+  exit 1
+}
+
+if [[ $# != 1 ]]; then
+  error "Please specify the version to release patch/minor/major"
+fi
+
+VERSION_PARAM=$1
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+function change_version() {
+  npm version "${VERSION_PARAM}"
+}
+
+function verify_main_branch() {
+  if [[ ${BRANCH} != 'main' ]]; then
+    error "Invalid branch name ${BRANCH}"
+  fi
+}
+
+function verify_uncommitted_changes() {
+  if [[ $(git status --porcelain) ]]; then
+    error "$1"
+  fi
+}
+
+function publish() {
+  npm publish --access public
+  git push && git push --follow-tags
+}
+
+verify_uncommitted_changes "There are uncommitted changes in the working tree."
+verify_main_branch
+# The bundle in dist/ is what the runner executes, so it has to be committed
+# before tagging: a tag pointing at a stale dist/ ships the previous code.
+make
+verify_uncommitted_changes "The build modified tracked files. Commit dist/ before releasing."
+change_version
+publish
+echo "📦✅"
