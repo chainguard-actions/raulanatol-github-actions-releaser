@@ -13,6 +13,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v2.3.0 | [`v2.3.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.3.0) | [`d965aeb`](https://github.com/raulanatol/github-actions-releaser/commit/d965aeb6cbcafa11eb46ba8b63a0e8dcd819fa9f) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v2.3.0/HARDENING.md) |
 | v2.4.1 | [`v2.4.1`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v2.4.1) | [`0561367`](https://github.com/raulanatol/github-actions-releaser/commit/0561367453f1cdbac0e5b71728276a4eb594e91a) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v2.4.1/HARDENING.md) |
 | v3.0.0 | [`v3.0.0`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v3.0.0) | [`a10fee2`](https://github.com/raulanatol/github-actions-releaser/commit/a10fee22a340ba799bedd927466c37f09b8d71ce) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v3.0.0/HARDENING.md) |
+| v4.0.1 | [`v4.0.1`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/tree/v4.0.1) | [`20df89d`](https://github.com/raulanatol/github-actions-releaser/commit/20df89d3efe12fe3378150a40334d80d9d0cf5c3) | [`HARDENING.md`](https://github.com/chainguard-actions/raulanatol-github-actions-releaser/blob/v4.0.1/HARDENING.md) |
 
 ## Privacy
 
